@@ -19,7 +19,7 @@ var logLevels = {
     'info': 3
 };
 
-var logNames = ['ERR','WARN','LOG','INFO'];
+var logNames = ['ERR ','WARN','LOG ','INFO'];
 var logColors = {
 	'red': '\u001b[31m',
 	'yellow': '\u001b[33m',
@@ -29,14 +29,21 @@ var logColors = {
 var levelColors = {
 	0: logColors.red,
 	1: logColors.yellow,
-	2: logColors.blue
+	3: logColors.blue
+};
+
+exports.log_request = function(req,res,next)
+{
+	var line = [req.method, req.url, req.ip, req.header('user-agent')];
+	log(logLevels.info, line);
+	next();
 };
 
 function log(level, args)
 {
-	if( level <= exports.config.log_level )
+	if( exports.config.log_file && level <= exports.config.log_level )
 	{
-		var line = util.format('[%s] [%s]', (new Date()).toISOString(), logNames[level], args.join());
+		var line = util.format('[%s] [%s]', (new Date()).toISOString(), logNames[level], args.join(' '));
 		fs.appendFile(exports.config.log_file, line+'\n');
 	}
 
@@ -44,11 +51,11 @@ function log(level, args)
 	{
 
 		var line = util.format('%s[%s] [%s]%s %s%s',
-			levelColors[level],
+			levelColors[level] || '',
 			(new Date()).toISOString(),
 			logNames[level],
 			level==logLevels.error ? '' : logColors.reset,
-			args.join(),
+			args.join(' '),
 			level!=logLevels.error ? '' : logColors.reset
 		);
 		console.log(line);
