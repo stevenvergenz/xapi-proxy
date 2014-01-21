@@ -1,0 +1,14 @@
+{
+	"name": "xapi-proxy",
+	"version": "0.0.1",
+	"description": "Protect LRS credentials by not exposing them to the browser at all.",
+	"author": "Steven Vergenz",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/stevenvergenz/xapi-proxy.git"
+	},
+	"dependencies": {
+		"express": "3.4.x"
+	},
+	"engine": "node >= 0.10.24"
+}
