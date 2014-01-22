@@ -1,0 +1,23 @@
+{
+	"name": "xapi-proxy-tests",
+	"version": "0.0.1",
+	"description": "Tests xAPI Proxy to help ensure maximum stability.",
+	"author": "Steven Vergenz",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/stevenvergenz/xapi-proxy.git"
+	},
+	"dependencies": {
+		"mocha": "1.17.x",
+		"request": "2.33.x"
+	},
+	"keywords": [
+		"experience api",
+		"xapi"
+	],
+	"scripts": {
+		"preinstall": "npm i -g mocha",
+		"test": "mocha test.js"
+	},
+	"engine": "node >= 0.10.24"
+}
