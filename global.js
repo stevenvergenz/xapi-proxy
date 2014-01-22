@@ -4,12 +4,20 @@
 var fs = require('fs'),
 	util = require('util');
 
-exports.config = {
-    'console_level': 3,
-	'log_level': 2,
-	'log_file': undefined,
-    'port': 3000
-};
+// parse config file
+exports.config = {};
+fs.readFile('config.json', function(err,data)
+{
+	if(err)
+		data = {};
+	else
+		data = JSON.parse(data);
+
+	exports.config.console_level = data.console_level || 3;
+	exports.config.log_level = data.log_level || 3;
+	exports.config.log_file = data.log_file;
+	exports.config.port = data.port || 3000;
+});
 
 var logLevels = {
     'error': 0,
