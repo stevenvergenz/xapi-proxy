@@ -29,12 +29,17 @@ exports.storeLRSInfo = function(req,res,next)
 	}
 
 	// generate random key
-	crypto.pseudoRandomBytes(12, function(err,buf){
+	crypto.pseudoRandomBytes(12, function(err,buf)
+	{
+		if(err){
+			res.send(500,'Could not generate new random key');
+			return;
+		}
 
 		// store session info under that key
 		var key = buf.toString('base64');
 		sessionInfo[key] = info;
-		global.log('Saving credentials for new key', key);
+		global.info('Saving credentials for new key', key);
 
 		// return info token
 		res.send(200, key);
@@ -44,8 +49,10 @@ exports.storeLRSInfo = function(req,res,next)
 // return whether or not the token is valid, and if it is, also return its expiration date
 exports.verifyToken = function(req,res,next)
 {
+	// token is valid iff "xapi" query arg present and that value in the lookup table
 	var url = liburl.parse(req.url, true);
-	if( url.query.xapi && sessionInfo[url.query.xapi] ){
+	if( url.query.xapi && sessionInfo[url.query.xapi] )
+	{
 		var info = sessionInfo[url.query.xapi];
 		res.send(200, {
 			'actor': info.actor,

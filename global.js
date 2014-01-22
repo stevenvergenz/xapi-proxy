@@ -4,11 +4,31 @@
 var fs = require('fs'),
 	util = require('util');
 
-exports.config = {
-    'console_level': 3,
-	'log_level': 2,
-	'log_file': undefined,
-    'port': 3000
+// parse config file
+exports.parseConfig = function()
+{
+	exports.config = {'console_level': logLevels.info};
+	var data;
+	try {
+		data = fs.readFileSync('./config.json');
+		data = JSON.parse(data);
+	}
+	catch(err)
+	{
+		if( err.code === 'ENOENT' )
+			exports.warning('No config.json found, loading defaults');
+		else if( err instanceof SyntaxError )
+			exports.warning('Config file has a syntax error, loading defaults');
+		else
+			exports.warning(err);
+		data = {};
+	}
+
+	exports.config.console_level = data.console_level || logLevels.info;
+	exports.config.log_level = data.log_level || logLevels.info;
+	exports.config.log_file = data.log_file;
+	exports.config.port = data.port || 3000;
+
 };
 
 var logLevels = {
@@ -22,7 +42,7 @@ var logNames = ['ERR ','WARN','LOG ','INFO'];
 var logColors = {
 	'red': '\u001b[31m',
 	'yellow': '\u001b[33m',
-	'blue': '\u001b[34m',
+	'blue': '\u001b[36m',
 	'reset': '\u001b[0m'
 };
 var levelColors = {
