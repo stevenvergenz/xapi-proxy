@@ -5,9 +5,8 @@ var http = require('http'),
 	proxy = require('./proxy.js');
 
 var app = express();
-app.use(express.bodyParser());
+app.use(express.json());
 app.use(express.cookieParser());
-app.use(express.session({secret:global.config.cookie_secret}));
 app.use(global.log_request);
 
 app.post('/config', proxy.storeLRSInfo);
