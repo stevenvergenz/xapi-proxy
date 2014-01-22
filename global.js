@@ -5,7 +5,6 @@ var fs = require('fs'),
 	util = require('util');
 
 exports.config = {
-    'cookie_secret': "You can't hit what you can't see!",
     'console_level': 3,
 	'log_level': 2,
 	'log_file': undefined,
