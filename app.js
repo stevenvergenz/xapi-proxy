@@ -17,7 +17,7 @@ app.all('/xapi', proxy.forward);
 
 // generic 404 handler
 app.use(function(req,res){
-	global.error('File not found:', req.url);
+	global.error('Nonexistent URL:', req.url);
 	res.send(404);
 });
 

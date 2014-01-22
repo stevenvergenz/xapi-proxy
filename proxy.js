@@ -15,6 +15,7 @@ exports.storeLRSInfo = function(req,res,next)
 	// verify/sanitize LRS information
 	var info = req.body;
 	if( !(info && info.endpoint && info.user && info.password && info.actor) ){
+		global.info('400 Bad request');
 		res.send(400);
 		return;
 	}
@@ -32,6 +33,7 @@ exports.storeLRSInfo = function(req,res,next)
 	crypto.pseudoRandomBytes(12, function(err,buf)
 	{
 		if(err){
+			global.info('500 Could not generate new random key');
 			res.send(500,'Could not generate new random key');
 			return;
 		}
@@ -54,12 +56,14 @@ exports.verifyToken = function(req,res,next)
 	if( url.query.xapi && sessionInfo[url.query.xapi] )
 	{
 		var info = sessionInfo[url.query.xapi];
+		global.info('Data exists for token', url.query.xapi);
 		res.send(200, {
 			'actor': info.actor,
 			'expires': (new Date(info.expires)).toISOString()
 		});
 	}
 	else {
+		global.info('404 Token does not exist');
 		res.send(404);
 	}
 };
@@ -67,5 +71,11 @@ exports.verifyToken = function(req,res,next)
 // look up LRS info and pass request there
 exports.forward = function(req,res,next)
 {
+	var url = liburl.parse(req.url, true);
+	if( !url.query.xapi || !sessionInfo[url.query.xapi] ){
+		global.info('401 No Token, No Auth, No Proxy');
+		res.send(401);
+	}
 
+	var info = sessionInfo[url.query.xapi];
 };
