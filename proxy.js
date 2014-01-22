@@ -39,7 +39,7 @@ exports.storeLRSInfo = function(req,res,next)
 		// store session info under that key
 		var key = buf.toString('base64');
 		sessionInfo[key] = info;
-		global.log('Saving credentials for new key', key);
+		global.info('Saving credentials for new key', key);
 
 		// return info token
 		res.send(200, key);
