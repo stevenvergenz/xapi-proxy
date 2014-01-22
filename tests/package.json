@@ -9,7 +9,8 @@
 	},
 	"dependencies": {
 		"mocha": "1.17.x",
-		"request": "2.33.x"
+		"request": "2.33.x",
+		"async": "0.2.x"
 	},
 	"keywords": [
 		"experience api",

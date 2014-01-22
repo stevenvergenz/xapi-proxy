@@ -1,23 +1,50 @@
-var assert = require("assert");
-var request = require("request");
-var done = 0;
+var assert = require("assert"),
+	request = require("request"),
+	async = require("async");
 
-//var test = 
-//console.log(test);
+describe('xAPI Proxy', function(){
 
-describe('Array', function(){
-  describe('#indexOf()', function(){
-	it('should return -1 when the value is not present', function(done){
-	  assert.equal(-1, [1,2,3].indexOf(5));
-	  assert.equal(-1, [1,2,3].indexOf(0));
-	  
-	  request('http://google.com', function(err, res, body){
-	  
-		console.log(body);
-		done();
-	  });
+  describe('#config', function(){
+	
+	async.series([
+		function(cb){
+			var totalTests = 2,
+				currentTest = 0;
+			
+			it('should return status code 404 when the token is not set or not found', function(done){
+			  
+			  request('http://localhost:3000', function(err, res, body){
+				assert.strictEqual(res.statusCode, 404, "Status code should be 404");
+				done();
+			  });
+			  
+			   request('http://localhost:3000?xapi=this_key_should_not_be_found', function(err, res, body){
+				assert.strictEqual(res.statusCode, 404, "Status code should be 404");
+				done();
+			  });	
+			  
+			   request('http://localhost:3000?xapi=%00../sdf/../../../../../var/www/', function(err, res, body){
+				assert.strictEqual(res.statusCode, 404, "Status code should be 404");
+				done();
+			  });
+			});
+			
+			cb(null, 'one');
+		},
+		function(cb){
+			// do some more stuff ...
+			cb(null, 'two');
+		}
+	],
+	// optional callback
+	function(err, results){
+		// results is now equal to ['one', 'two']
+	});
+	
 
-	})
-  })
+	
+
+  });
+  
 });
 
