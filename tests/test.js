@@ -40,11 +40,45 @@ colors.setTheme({
 describe('xAPI Proxy', function(){
 
 	async.series([
+
 		function(cb){
-			describe('#verifyToken', function(){	
-				
+			describe('#storeLRSInfo', function()
+			{
+				it('should fail on bad POSTs', function(done)
+				{
+					//Convenience function to help determine whether or not these tests are complete
+					var continueTests = function(){
+						shouldContinue(function(){
+							cb(null, 'storeLRSInfo');
+							done();
+						});
+					};
+					testCond.current = 0;
+					testCond.total = 2;
+
+					var testData = {
+						'endpoint': 'https://lrs.adlnet.gov/xapi/',
+						'user': 'bogusUser',
+						'password': 'ButteredCatParadox'
+					};
+
+					request('http://localhost:3000/config', {method:'POST'}, function(err,res,body){
+						assertHelper(assert.strictEqual, res.statusCode, 400, "Posting bad body should return Malformed");
+						continueTests();
+					});
+
+					request('http://localhost:3000/config', {method:'POST', json: testData}, function(err,res,body){
+						assertHelper(assert.strictEqual, res.statusCode, 400, "Posting bad body should return Malformed");
+						continueTests();
+					});
+				}); // end "it"
+			}); // end describe storeLRSInfo
+		},
+		function(cb){
+			describe('#verifyToken', function(){
+
 				it('should return status code 404 when the token is not set or not found', function(done){
-				  
+
 					//Convenience function to help determine whether or not these tests are complete
 					var continueTests = function(){
 						shouldContinue(function(){
@@ -52,24 +86,24 @@ describe('xAPI Proxy', function(){
 							done();
 						});
 					};
-
+					testCond.current = 0;
 					testCond.total = 3;
-					
-					request('http://localhost:3000', function(err, res, body){
+
+					request('http://localhost:3000/config', function(err, res, body){
 						assertHelper(assert.strictEqual, res.statusCode, 404, "Status code should be 404");
 						continueTests();
 					});
-					
-					request('http://localhost:3000?xapi=this_key_should_not_be_found', function(err, res, body){
-						assertHelper(assert.strictEqual, res.statusCode, 404, "Status code should be 404");
-						continueTests();
-					});	
-				  
-					request('http://localhost:3000?xapi=%00../sdf/../../../../../var/www/', function(err, res, body){
+
+					request('http://localhost:3000/config?xapi=this_key_should_not_be_found', function(err, res, body){
 						assertHelper(assert.strictEqual, res.statusCode, 404, "Status code should be 404");
 						continueTests();
 					});
-				  
+
+					request('http://localhost:3000/config?xapi=%00../sdf/../../../../../var/www/', function(err, res, body){
+						assertHelper(assert.strictEqual, res.statusCode, 404, "Status code should be 404");
+						continueTests();
+					});
+
 				}); //End "it"
 			}); //End describe verifyToken
 		},
