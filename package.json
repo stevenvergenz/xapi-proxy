@@ -8,11 +8,16 @@
 		"url": "https://github.com/stevenvergenz/xapi-proxy.git"
 	},
 	"dependencies": {
-		"express": "3.4.x"
+		"express": "3.4.x",
+		"mocha": "1.17.x",
+		"request": "2.33.x"
 	},
 	"keywords": [
 		"experience api",
 		"xapi"
 	],
+	"scripts": {
+		"test": "node_modules/mocha/bin/mocha tests/clean_test.js -R spec"
+	},
 	"engine": "node >= 0.10.24"
 }
