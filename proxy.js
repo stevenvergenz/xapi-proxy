@@ -1,10 +1,9 @@
 /**
  * Created by svergenz on 1/21/14.
  */
-var http = require('http'),
-	https = require('https'),
-	crypto = require('crypto'),
+var crypto = require('crypto'),
 	liburl = require('url'),
+	async = require('async'),
 	global = require('./global.js');
 
 var sessionInfo = {};
@@ -30,22 +29,33 @@ exports.storeLRSInfo = function(req,res,next)
 	}
 
 	// generate random key
-	crypto.pseudoRandomBytes(12, function(err,buf)
-	{
-		if(err){
-			global.info('500 Could not generate new random key');
-			res.send(500,'Could not generate new random key');
-			return;
+	var newKey = '';
+	async.doUntil(
+		// generate a new key
+		function(cb){
+			crypto.pseudoRandomBytes(12, function(err,buf){
+				newKey = buf.toString('base64');
+				cb(err);
+			});
+		},
+
+		// make sure there are no collisions before setting data
+		function(){ return !sessionInfo[newKey]; },
+
+		function(err){
+			if(err){
+				global.info('500 Could not generate new random key');
+				res.send(500,'Could not generate new random key');
+				return;
+			}
+
+			sessionInfo[newKey] = info;
+			global.info('Saving credentials for new key', newKey);
+
+			// return info token
+			res.send(200, newKey);
 		}
-
-		// store session info under that key
-		var key = buf.toString('base64');
-		sessionInfo[key] = info;
-		global.info('Saving credentials for new key', key);
-
-		// return info token
-		res.send(200, key);
-	});
+	);
 };
 
 // return whether or not the token is valid, and if it is, also return its expiration date
