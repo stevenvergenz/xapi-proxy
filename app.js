@@ -11,6 +11,14 @@ app.use(express.json());
 app.use(express.cookieParser());
 app.use(global.log_request);
 
+// add CORS support
+app.use(function(req,res,next){
+	res.set({
+		'Access-Control-Allow-Origin': '*'
+	});
+	next();
+});
+
 app.post('/config', proxy.storeLRSInfo);
 app.get('/config', proxy.verifyToken);
 app.all('/xapi', proxy.forward);

@@ -4,9 +4,19 @@
 var crypto = require('crypto'),
 	liburl = require('url'),
 	async = require('async'),
+	request = require('request'),
 	global = require('./global.js');
 
 var sessionInfo = {};
+
+// garbage collect expired info every hour
+setInterval(function(){
+	for(var i in sessionInfo){
+		if( sessionInfo[i].expires < Date.now() ){
+			delete sessionInfo[i];
+		}
+	}
+}, 3600000);
 
 // store LRS info in session, and return session token
 exports.storeLRSInfo = function(req,res,next)
@@ -66,7 +76,7 @@ exports.verifyToken = function(req,res,next)
 	if( url.query.xapi && sessionInfo[url.query.xapi] )
 	{
 		var info = sessionInfo[url.query.xapi];
-		global.info('Data exists for token', url.query.xapi);
+		global.info('Serving data for token', url.query.xapi);
 		res.send(200, {
 			'actor': info.actor,
 			'expires': (new Date(info.expires)).toISOString()
@@ -85,7 +95,26 @@ exports.forward = function(req,res,next)
 	if( !url.query.xapi || !sessionInfo[url.query.xapi] ){
 		global.info('401 No Token, No Auth, No Proxy');
 		res.send(401);
+		return;
 	}
 
+	// build new endpoint
 	var info = sessionInfo[url.query.xapi];
+	var url = liburl.parse(req.url,true);
+	var api = url.pathname.split('/');
+	api = api[api.length-1];
+	var lrs = info.endpoint + api;
+
+	console.log(req);
+
+	// build request
+	var options = {
+
+	};
+
+	// make request
+	global.info('Forwarding request to',lrs);
+
+	// return response
+	res.send(500);
 };
