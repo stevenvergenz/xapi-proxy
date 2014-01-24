@@ -19,7 +19,7 @@
 	],
 	"scripts": {
 		"preinstall": "npm i -g mocha",
-		"test": "mocha test.js"
+		"test": "mocha clean_test.js -R spec"
 	},
 	"engine": "node >= 0.10.24"
 }
