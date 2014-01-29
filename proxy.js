@@ -71,12 +71,12 @@ exports.storeLRSInfo = function(req,res,next)
 // return whether or not the token is valid, and if it is, also return its expiration date
 exports.verifyToken = function(req,res,next)
 {
-	// token is valid iff "xapi" query arg present and that value in the lookup table
+	// token is valid iff "lpt" query arg present and that value in the lookup table
 	var url = liburl.parse(req.url, true);
-	if( url.query.xapi && sessionInfo[url.query.xapi] )
+	if( url.query.lpt && sessionInfo[url.query.lpt] )
 	{
-		var info = sessionInfo[url.query.xapi];
-		global.info('Serving data for token', url.query.xapi);
+		var info = sessionInfo[url.query.lpt];
+		global.info('Serving data for token', url.query.lpt);
 		res.json({
 			'actor': info.actor,
 			'expires': (new Date(info.expires)).toISOString()
@@ -92,7 +92,7 @@ exports.verifyToken = function(req,res,next)
 exports.proxy = function(req,res,next)
 {
 	var url = liburl.parse(req.url, true);
-	if( !url.query.xapi || !sessionInfo[url.query.xapi] ){
+	if( !url.query.lpt || !sessionInfo[url.query.lpt] ){
 		global.info('401 No Token, No Auth, No Proxy');
 		res.send(401);
 		return;
@@ -100,11 +100,11 @@ exports.proxy = function(req,res,next)
 
 	// build new endpoint
 	var apis = /(statements|activities|activities\/state|activities\/profile|agents|agents\/profile|about)$/;
-	var info = sessionInfo[url.query.xapi];
+	var info = sessionInfo[url.query.lpt];
 	var api = url.pathname.match(apis)[0];
 	var lrs = liburl.parse(info.endpoint+api);
 	lrs.query = url.query;
-	delete lrs.query.xapi;
+	delete lrs.query.lpt;
 
 	// build request
 	var options = {

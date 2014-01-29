@@ -97,7 +97,7 @@ describe('xAPI Proxy', function(){
 		});
 
 		it('should return 404 when the token is not valid', function(done){
-			request.get('http://localhost:3000/config?xapi=this_key_should_not_be_found', function(err, res, body){
+			request.get('http://localhost:3000/config?lpt=this_key_should_not_be_found', function(err, res, body){
 				if(err){
 					done(err);
 					return;
@@ -113,7 +113,7 @@ describe('xAPI Proxy', function(){
 		});
 
 		it('should return actor and expiration with a valid token', function(done){
-			request.get('http://localhost:3000/config?xapi='+encodeURIComponent(validToken), function(err, res, body){
+			request.get('http://localhost:3000/config?lpt='+encodeURIComponent(validToken), function(err, res, body){
 				if(err){
 					done(err);
 					return;
@@ -151,7 +151,7 @@ describe('xAPI Proxy', function(){
 		});
 
 		it('should return 401 for invalid tokens', function(done){
-			request.get('http://localhost:3000/xapi/statements?xapi=00DeAdBeEfCaFe00', options, function(err,res,body){
+			request.get('http://localhost:3000/xapi/statements?lpt=00DeAdBeEfCaFe00', options, function(err,res,body){
 				if(err){
 					done(err);
 					return;
@@ -167,7 +167,9 @@ describe('xAPI Proxy', function(){
 		});
 
 		it('should proxy to LRS with valid token', function(done){
-			request.get('http://localhost:3000/xapi/statements?xapi='+encodeURIComponent(validToken), options, function(err,res,body){
+			var since = new Date(Date.now() - 3600000);
+			request.get('http://localhost:3000/xapi/statements?since='+since.toISOString()+'&lpt='+encodeURIComponent(validToken),
+				options, function(err,res,body){
 				if(err){
 					done(err);
 					return;
