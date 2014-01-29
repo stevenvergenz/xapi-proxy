@@ -26,15 +26,17 @@ _Request:_
 
 _Request body:_
 
-    {
-        "endpoint": "http://example.com/xapi/",
-        "user": "bogusUser",
-        "password": "ButteredCatParadox",
-        "actor": {
-            "name": "Steven Vergenz",
-            "mbox_sha1sum": "d16681af53ecce8c2c650c5751575325af277cee"
-        }
+```js
+{
+    "endpoint": "http://example.com/xapi/",
+    "user": "bogusUser",
+    "password": "ButteredCatParadox",
+    "actor": {
+        "name": "Steven Vergenz",
+        "mbox_sha1sum": "d16681af53ecce8c2c650c5751575325af277cee"
     }
+}
+```
 
 * _endpoint_: The URL of the LRS.
 * _user/password_: The basic auth credentials for the named LRS.
@@ -58,13 +60,15 @@ _Request:_
 
 _Response:_
 
-    {
-        "actor": {
-            "name": "Steven Vergenz",
-            "mbox_sha1sum": "d16681af53ecce8c2c650c5751575325af277cee"
-        },
-        "expires": "2014-01-29T21:15:00Z"
-    }
+```js
+{
+    "actor": {
+        "name": "Steven Vergenz",
+        "mbox_sha1sum": "d16681af53ecce8c2c650c5751575325af277cee"
+    },
+    "expires": "2014-01-29T21:15:00Z"
+}
+```
 
 * _actor_: The _actor_ body provided in the initial registration.
 * _expires_: The date/time when the LRS information will be deleted in ISO8601 format.
@@ -82,7 +86,9 @@ _Request:_
 
 _Response:_
 
-    {
-        "statements": [],
-        "more": ""
-    }
+```js
+{
+    "statements": [],
+    "more": ""
+}
+```
