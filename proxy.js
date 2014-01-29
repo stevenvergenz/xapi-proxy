@@ -23,7 +23,8 @@ exports.storeLRSInfo = function(req,res,next)
 {
 	// verify/sanitize LRS information
 	var info = req.body;
-	if( !(info && info.endpoint && info.user && info.password && info.actor) ){
+	if( req.header('content-type') != 'application/json' ||
+		!(info && info.endpoint && info.user && info.password && info.actor) ){
 		global.info('400 Bad request');
 		res.send(400);
 		return;
