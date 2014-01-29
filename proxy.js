@@ -77,7 +77,7 @@ exports.verifyToken = function(req,res,next)
 	{
 		var info = sessionInfo[url.query.xapi];
 		global.info('Serving data for token', url.query.xapi);
-		res.send(200, {
+		res.json({
 			'actor': info.actor,
 			'expires': (new Date(info.expires)).toISOString()
 		});
@@ -89,7 +89,7 @@ exports.verifyToken = function(req,res,next)
 };
 
 // look up LRS info and pass request there
-exports.forward = function(req,res,next)
+exports.proxy = function(req,res,next)
 {
 	var url = liburl.parse(req.url, true);
 	if( !url.query.xapi || !sessionInfo[url.query.xapi] ){
@@ -99,13 +99,10 @@ exports.forward = function(req,res,next)
 	}
 
 	// build new endpoint
+	var apis = /(statements|activities|activities\/state|activities\/profile|agents|agents\/profile|about)$/;
 	var info = sessionInfo[url.query.xapi];
-	var url = liburl.parse(req.url,true);
-	var api = url.pathname.split('/');
-	api = api[api.length-1];
+	var api = liburl.parse(req.url,true).pathname.match(apis)[0];
 	var lrs = info.endpoint + api;
-
-	console.log(req);
 
 	// build request
 	var options = {

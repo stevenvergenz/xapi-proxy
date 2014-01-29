@@ -18,10 +18,18 @@ app.use(function(req,res,next){
 	});
 	next();
 });
+app.options('/config', function(req,res,next){
+	res.set({
+		'Access-Control-Allow-Methods': 'OPTIONS, GET, POST',
+		'Access-Control-Allow-Headers': 'Content-Type'
+	});
+	res.send(200);
+});
 
 app.post('/config', proxy.storeLRSInfo);
 app.get('/config', proxy.verifyToken);
-app.all('/xapi', proxy.forward);
+
+app.all('/xapi/*', proxy.proxy);
 
 // generic 404 handler
 app.use(function(req,res){

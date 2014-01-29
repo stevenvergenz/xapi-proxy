@@ -128,4 +128,55 @@ describe('xAPI Proxy', function(){
 			});
 		});
 	}); //End describe verifyToken
+
+	describe('#proxy', function(){
+
+		it('should return 401 for missing tokens', function(done){
+			request.get('http://localhost:3000/xapi/statements', function(err,res,body){
+				if(err){
+					done(err);
+					return;
+				}
+				try {
+					assert.strictEqual(res.statusCode, 401);
+					done();
+				}
+				catch(e){
+					done(e);
+				}
+			})
+		});
+
+		it('should return 401 for invalid tokens', function(done){
+			request.get('http://localhost:3000/xapi/statements?xapi=herkaderpa', function(err,res,body){
+				if(err){
+					done(err);
+					return;
+				}
+				try {
+					assert.strictEqual(res.statusCode, 401);
+					done();
+				}
+				catch(e){
+					done(e);
+				}
+			})
+		});
+
+		it('should proxy to LRS with valid token', function(done){
+			request.get('http://localhost:3000/xapi/statements?xapi='+encodeURIComponent(validToken), function(err,res,body){
+				if(err){
+					done(err);
+					return;
+				}
+				try {
+					assert.ok(!!res.headers['x-experience-api-version']);
+					done();
+				}
+				catch(e){
+					done(e);
+				}
+			})
+		});
+	});
 });
