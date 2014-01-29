@@ -101,17 +101,36 @@ exports.proxy = function(req,res,next)
 	// build new endpoint
 	var apis = /(statements|activities|activities\/state|activities\/profile|agents|agents\/profile|about)$/;
 	var info = sessionInfo[url.query.xapi];
-	var api = liburl.parse(req.url,true).pathname.match(apis)[0];
-	var lrs = info.endpoint + api;
+	var api = url.pathname.match(apis)[0];
+	var lrs = liburl.parse(info.endpoint+api);
+	lrs.query = url.query;
+	delete lrs.query.xapi;
 
 	// build request
 	var options = {
-
+		url: liburl.format(lrs),
+		auth: {
+			user: info.user,
+			pass: info.password,
+			sendImmediately: true
+		},
+		headers: req.headers,
+		method: req.method,
+		body: JSON.stringify(req.body),
+		strictSSL: false
 	};
 
 	// make request
-	global.info('Forwarding request to',lrs);
-
-	// return response
-	res.send(500);
+	global.info('Forwarding request to',options.url);
+	request(options, function(err,response,body){
+		if(err){
+			global.error(err);
+			res.send(500);
+			return;
+		}
+		var shortBody = body.length > 50 ? body.substr(0,50)+'...' : body;
+		global.info('LRS response:',response.statusCode, shortBody);
+		res.set(response.headers);
+		res.send(response.statusCode, body);
+	});
 };

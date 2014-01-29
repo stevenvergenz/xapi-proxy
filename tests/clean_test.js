@@ -5,13 +5,14 @@ var validToken = '';
 
 var testData = {
 	'endpoint': 'https://lrs.adlnet.gov/xapi/',
-	'user': 'bogusUser',
-	'password': 'ButteredCatParadox',
+	'user': 'vwfdemo',
+	'password': 'TestConfiguration',
 	'actor': {
 		'name': 'Steven Vergenz',
 		'mbox_sha1sum': 'd16681af53ecce8c2c650c5751575325af277cee'
 	}
 };
+
 
 describe('xAPI Proxy', function(){
 	describe('#storeLRSInfo', function()
@@ -120,6 +121,7 @@ describe('xAPI Proxy', function(){
 				try {
 					assert.strictEqual(res.statusCode, 200);
 					assert.deepEqual(JSON.parse(body).actor, testData.actor);
+					assert.ok(!!JSON.parse(body).expires);
 					done();
 				}
 				catch(e){
@@ -130,9 +132,10 @@ describe('xAPI Proxy', function(){
 	}); //End describe verifyToken
 
 	describe('#proxy', function(){
+		var options = {'headers': {'x-experience-api-version':'1.0.1'}};
 
 		it('should return 401 for missing tokens', function(done){
-			request.get('http://localhost:3000/xapi/statements', function(err,res,body){
+			request.get('http://localhost:3000/xapi/statements', options, function(err,res,body){
 				if(err){
 					done(err);
 					return;
@@ -144,11 +147,11 @@ describe('xAPI Proxy', function(){
 				catch(e){
 					done(e);
 				}
-			})
+			});
 		});
 
 		it('should return 401 for invalid tokens', function(done){
-			request.get('http://localhost:3000/xapi/statements?xapi=herkaderpa', function(err,res,body){
+			request.get('http://localhost:3000/xapi/statements?xapi=00DeAdBeEfCaFe00', options, function(err,res,body){
 				if(err){
 					done(err);
 					return;
@@ -160,11 +163,11 @@ describe('xAPI Proxy', function(){
 				catch(e){
 					done(e);
 				}
-			})
+			});
 		});
 
 		it('should proxy to LRS with valid token', function(done){
-			request.get('http://localhost:3000/xapi/statements?xapi='+encodeURIComponent(validToken), function(err,res,body){
+			request.get('http://localhost:3000/xapi/statements?xapi='+encodeURIComponent(validToken), options, function(err,res,body){
 				if(err){
 					done(err);
 					return;
@@ -176,7 +179,7 @@ describe('xAPI Proxy', function(){
 				catch(e){
 					done(e);
 				}
-			})
+			});
 		});
 	});
 });
