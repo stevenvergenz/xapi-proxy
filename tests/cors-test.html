@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS test</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+
+            function onsuccess(body, status, xhr){
+                $('#result').text(body);
+            }
+
+            function onerror(xhr, status, err){
+                console.log(err);
+            }
+
+            $.ajax('http://localhost:3000/config', {
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    'endpoint': 'https://lrs.adlnet.gov/xapi/',
+                    'user': 'vwfdemo',
+                    'password': 'TestConfiguration',
+                    'actor': {
+                        'name': 'Steven Vergenz',
+                        'mbox_sha1sum': 'd16681af53ecce8c2c650c5751575325af277cee'
+                    }
+                }),
+                success: onsuccess,
+                error: onerror
+            });
+
+        });
+
+    </script>
+</head>
+<body>
+    <p id="result"></p>
+</body>
+</html>

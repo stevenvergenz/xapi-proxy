@@ -1,6 +1,7 @@
 var http = require('http'),
 	https = require('https'),
     express = require('express'),
+	cors = require('cors'),
     global = require('./global.js'),
 	proxy = require('./proxy.js');
 
@@ -12,14 +13,7 @@ app.use(express.cookieParser());
 app.use(global.log_request);
 
 // add CORS support
-app.use(function(req,res,next){
-	res.set({
-		'Access-Control-Allow-Origin': '*',
-		'Access-Control-Allow-Methods': 'OPTIONS, GET, POST',
-		'Access-Control-Allow-Headers': 'Content-Type'
-	});
-	next();
-});
+app.use(cors());
 
 app.post('/config', proxy.storeLRSInfo);
 app.get('/config', proxy.verifyToken);
