@@ -43,6 +43,8 @@ exports.storeLRSInfo = function(req,res,next)
 			res.send(400, 'LRS endpoint is not a URL.');
 			return;
 		}
+		if( !/\/$/.test(info.endpoint.pathname) )
+			info.endpoint = liburl.parse(info.endpoint.href+'/');
 	}
 
 	// generate random key
@@ -109,7 +111,7 @@ exports.proxy = function(req,res,next)
 	var apis = /(statements|activities|activities\/state|activities\/profile|agents|agents\/profile|about)$/;
 	var info = sessionInfo[url.query.lpt];
 	var api = url.pathname.match(apis)[0];
-	var lrs = liburl.parse(info.endpoint.href+api, true);
+	var lrs = liburl.parse(liburl.resolve(info.endpoint.href,api), true);
 	lrs.query = url.query;
 	delete lrs.query.lpt;
 

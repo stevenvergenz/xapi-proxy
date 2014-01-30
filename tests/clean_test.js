@@ -4,7 +4,7 @@ var assert = require("assert"),
 var validToken = '';
 
 var testData = {
-	'endpoint': 'https://lrs.adlnet.gov/xapi/',
+	'endpoint': 'https://lrs.adlnet.gov/xapi',
 	'user': 'vwfdemo',
 	'password': 'TestConfiguration',
 	'actor': {
