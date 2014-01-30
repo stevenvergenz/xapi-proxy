@@ -13,6 +13,7 @@ var sessionInfo = {};
 setInterval(function(){
 	for(var i in sessionInfo){
 		if( sessionInfo[i].expires < Date.now() ){
+			global.log('Expiring token', i);
 			delete sessionInfo[i];
 		}
 	}
@@ -25,18 +26,23 @@ exports.storeLRSInfo = function(req,res,next)
 	var info = req.body;
 	if( req.header('content-type') != 'application/json' ||
 		!(info && info.endpoint && info.user && info.password && info.actor) ){
-		global.info('400 Bad request');
-		res.send(400);
+		global.info('400 Sparse info block');
+		res.send(400, "Info block must contain the keys 'endpoint', 'user', 'password', and 'actor'.");
 		return;
 	}
 	else {
 		info = {
-			'endpoint': info.endpoint,
+			'endpoint': liburl.parse(info.endpoint),
 			'user': info.user,
 			'password': info.password,
 			'actor': info.actor,
 			'expires': Date.now() + 24*60*60*1000
 		};
+		if( !info.endpoint.protocol || !info.endpoint.host ){
+			global.info('400 Invalid endpoint');
+			res.send(400, 'LRS endpoint is not a URL.');
+			return;
+		}
 	}
 
 	// generate random key
@@ -85,7 +91,7 @@ exports.verifyToken = function(req,res,next)
 	}
 	else {
 		global.info('404 Token does not exist');
-		res.send(404);
+		res.send(404, 'Token does not exist or was not specified.');
 	}
 };
 
@@ -95,7 +101,7 @@ exports.proxy = function(req,res,next)
 	var url = liburl.parse(req.url, true);
 	if( !url.query.lpt || !sessionInfo[url.query.lpt] ){
 		global.info('401 No Token, No Auth, No Proxy');
-		res.send(401);
+		res.send(401, 'Token Required');
 		return;
 	}
 
@@ -103,7 +109,7 @@ exports.proxy = function(req,res,next)
 	var apis = /(statements|activities|activities\/state|activities\/profile|agents|agents\/profile|about)$/;
 	var info = sessionInfo[url.query.lpt];
 	var api = url.pathname.match(apis)[0];
-	var lrs = liburl.parse(info.endpoint+api);
+	var lrs = liburl.parse(info.endpoint.href+api, true);
 	lrs.query = url.query;
 	delete lrs.query.lpt;
 
@@ -126,7 +132,7 @@ exports.proxy = function(req,res,next)
 	request(options, function(err,response,body){
 		if(err){
 			global.error(err);
-			res.send(500);
+			res.send(500, err);
 			return;
 		}
 		var shortBody = body.length > 50 ? body.substr(0,50)+'...' : body;

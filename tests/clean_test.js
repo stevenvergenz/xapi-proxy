@@ -58,6 +58,33 @@ describe('xAPI Proxy', function(){
 			});
 		});
 
+		it('should return 400 on malformed URLs', function(done)
+		{
+			var testData = {
+				'endpoint': 'no_such_url',
+				'user': 'bogusUser',
+				'password': 'ButteredCatParadox',
+				'actor': {
+					'name': 'Steven Vergenz',
+					'mbox_sha1sum': 'd16681af53ecce8c2c650c5751575325af277cee'
+				}
+			};
+
+			request.post('http://localhost:3000/config', {json:testData}, function(err,res,body){
+				if(err){
+					done(err);
+					return;
+				}
+				try {
+					assert.strictEqual(res.statusCode, 400);
+					done();
+				}
+				catch(e){
+					done(e);
+				}
+			});
+		});
+
 		it('should return a token on valid POSTs', function(done)
 		{
 			request.post('http://localhost:3000/config', {json:testData}, function(err,res,body){
